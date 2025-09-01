@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Habibie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#0f172a',
+                        charcoal: '#111827',
+                        slate: '#334155',
+                        electric: '#2563eb',
+                        lime: '#a3e635',
+                    },
+                    fontFamily: {
+                        spartan: ['League Spartan', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=League+Spartan:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            scroll-behavior: smooth;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'League Spartan', sans-serif;
+        }
+        
+        .glassmorphism {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .flip-card {
+            perspective: 1000px;
+        }
+        
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
+        
+        .flip-card-back {
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .cursor-halo {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(163, 230, 53, 0.2);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: screen;
+            transition: width 0.2s, height 0.2s;
+        }
+        
+        .cursor-halo.active {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid #a3e635;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .05em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #a3e635 }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #a3e635;
+            opacity: 0;
+            z-index: 10000;
+            animation: confetti-fall 5s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Game specific styles */
+        .reaction-box {
+            transition: background-color 0.3s;
+        }
+        
+        .wheel {
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        
+        .memory-card {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card-front, .memory-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .memory-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .star {
+            animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="dark bg-midnight text-slate-100">
+    <!-- Cursor Halo Effect -->
+    <div class="cursor-halo" id="cursorHalo"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glassmorphism py-3 px-4 rounded-b-2xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#hero" class="text-lime font-spartan font-bold text-xl">For Habibie</a>
+            <div class="hidden md:flex space-x-6">
+                <a href="#playlist" class="hover:text-electric transition">Playlist</a>
+                <a href="#timeline" class="hover:text-electric transition">Timeline</a>
+                <a href="#games" class="hover:text-electric transition">Games</a>
+                <a href="#riddles" class="hover:text-electric transition">Riddles</a>
+                <a href="#guestbook" class="hover:text-electric transition">Guestbook</a>
+                <a href="#letter" class="hover:text-electric transition">Letter</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-lg bg-charcoal hover:bg-slate-700 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+                <button id="focusMode" class="p-2 rounded-lg bg-charcoal hover:bg-slate-700 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen relative flex items-center justify-center overflow-hidden">
+        <div id="particles-container" class="absolute inset-0"></div>
+        <div class="text-center z-10 px-4 max-w-3xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-spartan font-bold mb-6">Hey, Habibie.</h1>
+            <p class="text-xl md:text-2xl mb-10 opacity-90">This one's for you — press ▶ to start.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button id="playPlaylist" class="bg-electric hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-2xl transition transform hover:-translate-y-1">
+                    Play Playlist
+                </button>
+                <button onclick="scrollToSection('games')" class="bg-lime hover:bg-lime-600 text-charcoal font-medium py-3 px-6 rounded-2xl transition transform hover:-translate-y-1">
+                    Game Time
+                </button>
+                <button onclick="openLetterModal()" class="glassmorphism hover:bg-slate-700 font-medium py-3 px-6 rounded-2xl transition transform hover:-translate-y-1">
+                    Open Letter
+                </button>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-8xl opacity-20 font-spartan hover:rotate-12 transition-transform duration-300">H</div>
+    </section>
+
+    <!-- Playlist Section -->
+    <section id="playlist" class="py-16 px-4 bg-charcoal">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-3xl font-spartan font-bold mb-8 text-center">Playlist</h2>
+            <div class="rounded-2xl overflow-hidden shadow-xl">
+                <iframe src="https://open.spotify.com/embed/playlist/6q03K6CCz4RG6Q8w8roEin" width="100%" height="380" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            </div>
+            <div class="mt-6 glassmorphism rounded-2xl p-4 flex items-center justify-between sticky bottom-4">
+                <div class="flex items-center">
+                    <div class="h-12 w-12 bg-slate-700 rounded-lg mr-3"></div>
+                    <div>
+                        <p class="font-medium">Now Playing</p>
+                        <p class="text-sm opacity-75">Playlist for Habibie</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full bg-slate-700 hover:bg-slate-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button class="p-3 rounded-full bg-electric hover:bg-blue-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <button class="p-2 rounded-full bg-slate-700 hover:bg-slate-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section id="timeline" class="py-16 px-4 bg-midnight">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-3xl font-spartan font-bold mb-8 text-center">Chapters I Keep</h2>
+            <div class="relative">
+                <!-- Timeline line -->
+                <div class="absolute left-4 md:left-1/2 h-full w-1 bg-electric transform -translate-x-1/2"></div>
+                
+                <!-- Timeline items -->
+                <div class="space-y-12">
+                    <!-- Item 1 -->
+                    <div class="relative flex flex-col md:flex-row items-center">
+                        <div class="timeline-dot absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-electric transform -translate-x-1/2"></div>
+                        <div class="ml-12 md:ml-0 md:w-1/2"></div>
+                        <div class="ml-12 md:ml-0 md:w-1/2 md:pl-8">
+                            <div class="flip-card h-64 w-full">
+                                <div class="flip-card-inner w-full h-full">
+                                    <div class="flip-card-front glassmorphism rounded-2xl p-6 flex flex-col justify-center">
+                                        <div class="text-4xl mb-4">🎯</div>
+                                        <h3 class="text-xl font-spartan font-bold mb-2">The First Meeting</h3>
+                                        <p class="text-sm opacity-75">Click to reveal memory</p>
+                                    </div>
+                                    <div class="flip-card-back glassmorphism rounded-2xl">
+                                        <p class="text-center">"I still remember the first time we met. Your smile was contagious and your energy lit up the room."</p>
+                                        <button class="absolute bottom-4 right-4 like-btn" data-id="1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 2 -->
+                    <div class="relative flex flex-col md:flex-row items-center">
+                        <div class="timeline-dot absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-electric transform -translate-x-1/2"></div>
+                        <div class="ml-12 md:ml-0 md:w-1/2 md:pr-8">
+                            <div class="flip-card h-64 w-full">
+                                <div class="flip-card-inner w-full h-full">
+                                    <div class="flip-card-front glassmorphism rounded-2xl p-6 flex flex-col justify-center">
+                                        <div class="text-4xl mb-4">🌄</div>
+                                        <h3 class="text-xl font-spartan font-bold mb-2">Sunrise Adventure</h3>
+                                        <p class="text-sm opacity-75">Click to reveal memory</p>
+                                    </div>
+                                    <div class="flip-card-back glassmorphism rounded-2xl">
+                                        <p class="text-center">"Waking up at 4 AM to watch the sunrise was totally worth it. That golden hour glow on your face is forever etched in my memory."</p>
+                                        <button class="absolute bottom-4 right-4 like-btn" data-id="2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                    
+                    <!-- More timeline items would go here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="py-16 px-4 bg-charcoal">
+        <div class="container mx-auto max-w-6xl">
+            <h2 class="text-3xl font-spartan font-bold mb-8 text-center">Games</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Spin the Wheel -->
+                <div class="glassmorphism rounded-2xl p-6 card-hover">
+                    <h3 class="text-xl font-spartan font-bold mb-4">Spin the Wheel</h3>
+                    <div class="relative w-64 h-64 mx-auto mb-6">
+                        <div class="wheel absolute inset-0 rounded-full bg-slate-700"></div>
+                        <button id="spinWheel" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-electric hover:bg-blue-700 transition">
+                            Spin
+                        </button>
+                    </div>
+                    <div id="wheelResult" class="text-center min-h-20 glassmorphism rounded-xl p-4"></div>
+                </div>
+                
+                <!-- Reaction Test -->
+                <div class="glassmorphism rounded-2xl p-6 card-hover">
+                    <h3 class="text-xl font-spartan font-bold mb-4">Reaction Test</h3>
+                    <div class="reaction-box w-full h-64 rounded-2xl bg-slate-700 mb-4 flex items-center justify-center cursor-pointer" id="reactionBox">
+                        <p class="text-lg">Click when color changes</p>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p>Your time: <span id="reactionTime">0</span>ms</p>
+                            <p>Best: <span id="bestTime">0</span>ms</p>
+                        </div>
+                        <button id="startReactionTest" class="bg-electric hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+                            Start
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- More games would be implemented here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Other sections would follow the same pattern -->
+
+    <!-- Footer -->
+    <footer class="py-8 px-4 bg-midnight border-t border-slate-700 text-center">
+        <p class="mb-4">Made with ❤️ for Habibie</p>
+        <div class="flex justify-center space-x-4">
+            <button id="themeToggleFooter" class="p-2 rounded-lg bg-charcoal hover:bg-slate-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            <button id="easterEggBtn" class="p-2 rounded-lg bg-charcoal hover:bg-slate-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Letter Modal -->
+    <div id="letterModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="glassmorphism rounded-2xl p-6 w-11/12 max-w-md">
+            <h3 class="text-xl font-spartan font-bold mb-4">Enter Password</h3>
+            <input type="password" id="passwordInput" class="w-full bg-slate-700 rounded-lg p-3 mb-4" placeholder="Password">
+            <p id="passwordHint" class="text-sm text-slate-400 mb-4 hidden">Hint: Initials + date (mmdd)?</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeLetterModal()" class="py-2 px-4 rounded-lg bg-slate-700 hover:bg-slate-600 transition">Cancel</button>
+                <button onclick="checkPassword()" class="py-2 px-4 rounded-lg bg-electric hover:bg-blue-700 transition">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIG Object
+        const CONFIG = {
+            PASSWORD: "HBB27",
+            PASSWORD_HINT: "Initials + date (mmdd)?",
+            COUNTDOWN_TARGET: "2025-12-31T23:59:59",
+            PLAYLIST_EMBED_SRC: "https://open.spotify.com/embed/playlist/6q03K6CCz4RG6Q8w8roEin"
+        };
+
+        // DOM Elements
+        const cursorHalo = document.getElementById('cursorHalo');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeToggleFooter = document.getElementById('themeToggleFooter');
+        const focusModeBtn = document.getElementById('focusMode');
+        const playPlaylistBtn = document.getElementById('playPlaylist');
+        const letterModal = document.getElementById('letterModal');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordHint = document.getElementById('passwordHint');
+        const easterEggBtn = document.getElementById('easterEggBtn');
+        const reactionBox = document.getElementById('reactionBox');
+        const startReactionTest = document.getElementById('startReactionTest');
+        const reactionTime = document.getElementById('reactionTime');
+        const bestTime = document.getElementById('bestTime');
+        const spinWheel = document.getElementById('spinWheel');
+        const wheelResult = document.getElementById('wheelResult');
+
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.className = savedTheme;
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.className;
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.className = newTheme;
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Cursor Halo Effect
+        document.addEventListener('mousemove', (e) => {
+            cursorHalo.style.left = `${e.clientX}px`;
+            cursorHalo.style.top = `${e.clientY}px`;
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursorHalo.classList.add('active');
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursorHalo.classList.remove('active');
+        });
+
+        // Particle Animation
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size, position, and color
+                const size = Math.random() * 20 + 5;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const colors = ['#2563eb', '#a3e635', '#ffffff', '#334155'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.backgroundColor = color;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Letter Modal Functions
+        function openLetterModal() {
+            letterModal.classList.remove('hidden');
+        }
+
+        function closeLetterModal() {
+            letterModal.classList.add('hidden');
+            passwordInput.value = '';
+            passwordHint.classList.add('hidden');
+        }
+
+        function checkPassword() {
+            if (passwordInput.value === CONFIG.PASSWORD) {
+                // Password correct - reveal letter
+                alert('Password correct! The letter would be revealed here.');
+                closeLetterModal();
+            } else {
+                // Password incorrect
+                passwordInput.classList.add('animate-shake');
+                passwordHint.classList.remove('hidden');
+                setTimeout(() => {
+                    passwordInput.classList.remove('animate-shake');
+                }, 500);
+            }
+        }
+
+        // Scroll to Section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Easter Egg
+        let typedString = '';
+        document.addEventListener('keydown', (e) => {
+            typedString += e.key.toUpperCase();
+            if (typedString.length > 7) {
+                typedString = typedString.slice(1);
+            }
+            
+            if (typedString === 'HABIBIE') {
+                triggerFireworks();
+                showSecretMessage();
+            }
+            
+            // Keyboard shortcuts
+            switch(e.key.toLowerCase()) {
+                case 'p':
+                    playPlaylistBtn.click();
+                    break;
+                case 'l':
+                    openLetterModal();
+                    break;
+                case 'g':
+                    scrollToSection('games');
+                    break;
+                case 't':
+                    toggleTheme();
+                    break;
+                case 'f':
+                    toggleFocusMode();
+                    break;
+            }
+        });
+
+        function triggerFireworks() {
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            const colors = ['#2563eb', '#a3e635', '#ffffff', '#334155'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 10 + 5;
+            const posX = Math.random() * window.innerWidth;
+            
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+            confetti.style.left = `${posX}px`;
+            confetti.style.backgroundColor = color;
+            
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation completes
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+
+        function showSecretMessage() {
+            const message = document.createElement('div');
+            message.className = 'fixed inset-0 flex items-center justify-center z-50';
+            message.innerHTML = `
+                <div class="glassmorphism rounded-2xl p-8 text-center max-w-md">
+                    <h3 class="text-2xl font-spartan font-bold mb-4 text-lime">You're Amazing, Habibie!</h3>
+                    <p class="mb-6">This secret message is just for you. You've discovered the easter egg!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-electric hover:bg-blue-700 text-white py-2 px-6 rounded-lg">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(message);
+        }
+
+        // Focus Mode
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+            // Implementation would show/hide elements as needed
+        }
+
+        // Reaction Test Game
+        let reactionStartTime;
+        let reactionTimeout;
+        let bestReactionTime = localStorage.getItem('bestReactionTime') || 0;
+        
+        bestTime.textContent = bestReactionTime;
+        
+        startReactionTest.addEventListener('click', () => {
+            reactionBox.style.backgroundColor = '#334155';
+            reactionBox.onclick = null;
+            
+            const delay = Math.random() * 3000 + 1000;
+            reactionTimeout = setTimeout(() => {
+                reactionBox.style.backgroundColor = '#a3e635';
+                reactionStartTime = new Date().getTime();
+                
+                reactionBox.onclick = () => {
+                    const reactionEndTime = new Date().getTime();
+                    const timeTaken = reactionEndTime - reactionStartTime;
+                    reactionTime.textContent = timeTaken;
+                    
+                    if (bestReactionTime === 0 || timeTaken < bestReactionTime) {
+                        bestReactionTime = timeTaken;
+                        bestTime.textContent = bestReactionTime;
+                        localStorage.setItem('bestReactionTime', bestReactionTime);
+                    }
+                    
+                    reactionBox.style.backgroundColor = '#334155';
+                    reactionBox.onclick = null;
+                };
+            }, delay);
+        });
+
+        // Spin the Wheel Game
+        const wheelPrompts = [
+            "Pick your favorite track today",
+            "Name 3 things you're grateful for",
+            "Share a happy memory from this week",
+            "What's something you're looking forward to?",
+            "Tell about a recent small victory",
+            "What made you smile today?"
+        ];
+        
+        spinWheel.addEventListener('click', () => {
+            const spinDegrees = 1800 + Math.floor(Math.random() * 360);
+            document.querySelector('.wheel').style.transform = `rotate(${spinDegrees}deg)`;
+            
+            setTimeout(() => {
+                const randomPrompt = wheelPrompts[Math.floor(Math.random() * wheelPrompts.length)];
+                wheelResult.textContent = randomPrompt;
+            }, 3000);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            createParticles();
+            
+            // Event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            themeToggleFooter.addEventListener('click', toggleTheme);
+            focusModeBtn.addEventListener('click', toggleFocusMode);
+            playPlaylistBtn.addEventListener('click', () => {
+                scrollToSection('playlist');
+            });
+            easterEggBtn.addEventListener('click', showSecretMessage);
+            
+            // Initialize like buttons
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                const memoryId = btn.getAttribute('data-id');
+                const isLiked = localStorage.getItem(`memory-${memoryId}-liked`) === 'true';
+                
+                if (isLiked) {
+                    btn.classList.add('text-lime');
+                }
+                
+                btn.addEventListener('click', () => {
+                    const currentlyLiked = btn.classList.contains('text-lime');
+                    if (currentlyLiked) {
+                        btn.classList.remove('text-lime');
+                        localStorage.setItem(`memory-${memoryId}-liked`, 'false');
+                    } else {
+                        btn.classList.add('text-lime');
+                        localStorage.setItem(`memory-${memoryId}-liked`, 'true');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
